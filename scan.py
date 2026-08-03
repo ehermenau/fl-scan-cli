@@ -1,9 +1,11 @@
 import sys
 import requests
 import json
+import pathlib
 
 base_url = "https://scan.fetchlabs.io"
 file = "/home/user/git_repos/edge-first-infra/gitops/hub/apps/10-scanner/manifests/networkpolicy.yaml"
+folder = "/home/user/git_repos/fetchlabs-scanner/test/fixtures/bad"
 
 
 def checkHealth(base_url: str) -> None:
@@ -48,10 +50,19 @@ def printResults(json_r: dict) -> None:
         print("No critical vulns found!")
 
 
+def findFiles(folder: str) -> list:
+    base_path = pathlib.Path(folder)
+    files = [file for file in base_path.iterdir()]
+    return files
+
+
 if __name__ == "__main__":
     checkHealth(base_url=base_url)
-    format = findFormat(file)
-    code = loadFile(file)
-    result = uploadScan(format, code)
-    json_r = result.json()
-    printResults(json_r)
+    files = findFiles(folder)
+    for file in files:
+        tfile = str(file)
+        format = findFormat(tfile)
+        code = loadFile(tfile)
+        result = uploadScan(format, code)
+        json_r = result.json()
+        printResults(json_r)
